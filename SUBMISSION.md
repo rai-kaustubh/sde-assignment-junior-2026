@@ -1,9 +1,9 @@
 # Submission
 
 ## Candidate
-- **Name:** _fill in_
+- **Name:** Kaustubh Rai
 - **Assignment chosen:** A (Data)
-- **Time spent (honest estimate):** _fill in_
+- **Time spent (honest estimate):** 10 hrs
 
 ## How to run
 ```bash
