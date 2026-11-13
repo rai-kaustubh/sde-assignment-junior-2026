@@ -56,12 +56,17 @@ class DropResult:
     rejections: list[Rejection] = field(default_factory=list)
 
 
-def preprocess_drop(drop_dir: str | Path, schema_dir: str | Path) -> DropResult:
+def preprocess_drop(
+    drop_dir: str | Path, schema_dir: str | Path, apply_default_values: bool = True
+) -> DropResult:
     """Pre-process all lead files under <drop_dir>/leads/<workflow_id>/*.csv.
 
     Workflows are visited in name order and files in filename order, so rows come
     out in the order the duplicate/merge rules need. workflow_id is the folder name,
     batch_id is the file stem.
+
+    Pass apply_default_values=False when the leads still have to be merged with leads from
+    earlier drops: defaults must only fill what is still null AFTER that merge.
     """
     drop_dir, schema_dir = Path(drop_dir), Path(schema_dir)
     result = DropResult()
@@ -94,9 +99,10 @@ def preprocess_drop(drop_dir: str | Path, schema_dir: str | Path) -> DropResult:
                     _merge_row(result, workflow_id, batch_id, values)
 
         # All rows of this workflow are merged; only now fill still-null fields.
-        for lead in result.leads.values():
-            if lead.workflow_id == workflow_id:
-                lead.fields = apply_defaults(lead.fields, schema)
+        if apply_default_values:
+            for lead in result.leads.values():
+                if lead.workflow_id == workflow_id:
+                    lead.fields = apply_defaults(lead.fields, schema)
 
     return result
 
